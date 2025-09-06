@@ -1,7 +1,10 @@
 const express = require("express");
 const { default: mongoose } = require("mongoose");
+const Todo = require("./model/todoSchema");
 const app = express();
 require("dotenv").config();
+
+app.use(express.json());
 
 // Database connection
 mongoose
@@ -14,11 +17,91 @@ mongoose
   });
 
 // route define
-app.post("/addTodo", (req, res) => {
-  res.status(201).json({ success: true, message: "Todo created successfully" });
+
+// add task
+app.post("/addTodo", async (req, res) => {
+  try {
+    let { name, age } = req.body;
+    let todo = new Todo({
+      name,
+      age,
+    });
+    await todo.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Todo created successfully",
+      data: todo,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error });
+  }
 });
-app.get("/getTodo", (req, res) => {
-  res.status(200).json({ success: true, message: "Todo fetch successfully" });
+
+// get all task
+app.get("/getAllTodo", async (req, res) => {
+  try {
+    let allTodo = await Todo.find({});
+    res.status(200).json({
+      success: true,
+      message: "Todo fetch successfully",
+      data: allTodo,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error });
+  }
+});
+
+// get single task
+app.get("/getATask/:name", async (req, res) => {
+  try {
+    let { name } = req.params;
+    let singleTask = await Todo.findOne({ age: name });
+
+    res.status(200).json({
+      success: true,
+      message: "A single task fetched",
+      data: singleTask,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error });
+  }
+});
+
+// update task
+app.patch("/updateTask/:id", async (req, res) => {
+  try {
+    let { id } = req.params;
+    let { name } = req.body;
+    let updateTask = await Todo.findOneAndUpdate(
+      { name: id },
+      { name: name },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Task Updated",
+      data: updateTask,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error });
+  }
+});
+
+// delete task
+app.delete("/deleteTask/:id", async (req, res) => {
+  try {
+    let { id } = req.params;
+    let deletedTask = await Todo.findOneAndDelete({ _id: id }, { new: true });
+    res.status(200).json({
+      success: true,
+      message: "Task Deleted",
+      data: deletedTask,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error });
+  }
 });
 
 app.listen(process.env.PORT, () => {
