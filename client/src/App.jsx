@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 const Todo = () => {
   const [name, setName] = useState("");
@@ -12,7 +13,7 @@ const Todo = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !age) return alert("name or age is empty");
+    if (!name || !age) return toast.error("Name or Age is empty");
 
     axios
       .post("http://localhost:3000/addTodo", {
@@ -21,16 +22,16 @@ const Todo = () => {
       })
       .then((res) => {
         console.log(res);
-        alert("added task");
+        toast.success("User added successfully");
+        setTodos([{ _id: res.data.data._id, name, age }, ...todos]);
+        setName("");
+        setAge("");
+        getAllTask();
       })
       .catch((err) => {
         console.log(err);
-        alert("something went wrong ");
+        toast.error("Something went wrong");
       });
-
-    setTodos([...todos, { id: Date.now(), name, age }]);
-    setName("");
-    setAge("");
   };
 
   const handleDelete = (id) => {
@@ -38,11 +39,11 @@ const Todo = () => {
       .delete(`http://localhost:3000/deleteTask/${id}`)
       .then((res) => {
         console.log(res);
-        alert("Deleted task");
+        toast.success("User deleted");
       })
       .catch((err) => {
         console.log(err);
-        alert("something went wrong ");
+        toast.error("Something went wrong");
       });
     // setTodos(todos.filter((todo) => todo.id !== id));
   };
@@ -56,17 +57,18 @@ const Todo = () => {
   const handleUpdate = () => {
     axios
       .patch(`http://localhost:3000/updateTask/${id}`, {
+        // id: todo._id,
         name: updateName,
         age: updateAge,
       })
       .then((res) => {
         console.log(res);
-        alert("Updated task");
+        toast.success("User has been Updated successfully");
         setEditModal(false);
       })
       .catch((err) => {
         console.log(err);
-        alert("something went wrong ");
+        toast.error("Something went wrong");
       });
   };
 
@@ -77,7 +79,8 @@ const Todo = () => {
         setTodos(res.data.data);
       })
       .catch((err) => {
-        console.log(err);
+        toast.error("Failed to fetch tasks");
+        console.log(err)
       });
   }
 
@@ -88,6 +91,7 @@ const Todo = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md">
+        <ToastContainer position="top-center" autoClose={2000}></ToastContainer>
         <h1 className="text-2xl font-bold text-center text-gray-700 mb-6">
           Add User Name & Age
         </h1>
