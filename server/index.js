@@ -1,10 +1,12 @@
 const express = require("express");
+const cors = require("cors");
 const { default: mongoose } = require("mongoose");
 const Todo = require("./model/todoSchema");
 const app = express();
 require("dotenv").config();
 
 app.use(express.json());
+app.use(cors());
 
 // Database connection
 mongoose
@@ -72,10 +74,11 @@ app.get("/getATask/:name", async (req, res) => {
 app.patch("/updateTask/:id", async (req, res) => {
   try {
     let { id } = req.params;
-    let { name } = req.body;
+    let { name, age } = req.body;
     let updateTask = await Todo.findOneAndUpdate(
-      { name: id },
+      { _id: id },
       { name: name },
+      { age: age },
       { new: true }
     );
 
