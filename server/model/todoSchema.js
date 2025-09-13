@@ -5,6 +5,7 @@ let todoSchema = new Schema({
   name: {
     type: String,
     require: true,
+    minLength: 3,
   },
   age: {
     type: Number,

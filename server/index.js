@@ -77,8 +77,7 @@ app.patch("/updateTask/:id", async (req, res) => {
     let { name, age } = req.body;
     let updateTask = await Todo.findOneAndUpdate(
       { _id: id },
-      { name: name },
-      { age: age },
+      { name, age },
       { new: true }
     );
 
